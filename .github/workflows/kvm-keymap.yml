@@ -1,0 +1,39 @@
+name: kvm keymap (Air75 V2)
+
+# Builds the personal keymap keyboards/nuphy/air75_v2/ansi/keymaps/kvm on every push to the
+# kvm/keymap branch. The board firmware itself is built by nuphy.yml (default keymap).
+
+on:
+  push:
+    branches: [kvm/keymap]
+  workflow_dispatch:
+
+jobs:
+  firmware:
+    runs-on: ubuntu-latest
+    container: ghcr.io/qmk/qmk_cli
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0   # tags, so the firmware reports its version (git describe)
+
+      - name: Lint
+        run: |
+          git config --global --add safe.directory '*'
+          qmk lint -kb nuphy/air75_v2/ansi -km kvm
+
+      - name: Build
+        shell: bash
+        run: |
+          qmk compile -kb nuphy/air75_v2/ansi -km kvm
+          version=$(git describe --tags --always --dirty)
+          mkdir -p out
+          cp nuphy_air75_v2_ansi_kvm.bin "out/nuphy_air75_v2_ansi_kvm_${version}.bin"
+          cp keyboards/nuphy/air75_v2/ansi/keymaps/*.json out/
+          (cd out && sha256sum *.bin > SHA256SUMS)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kvm-keymap-air75-v2
+          path: out/
