@@ -8,6 +8,10 @@
 // A roll where Caps Lock is released first still counts as a tap (layout switch).
 #define PERMISSIVE_HOLD
 
+// Caps Lock gets its own, shorter tapping term from get_tapping_term() in keymap.c (170 ms; the board-wide
+// TAPPING_TERM from keyboard.json is 200). Without this define QMK ignores that function.
+#define TAPPING_TERM_PER_KEY
+
 // The tapping term itself is per key, in keymap.c (get_tapping_term): this QMK version takes
 // the board-wide TAPPING_TERM from keyboard.json ("tapping.term": 200) and redefining it
 // here would not compile.

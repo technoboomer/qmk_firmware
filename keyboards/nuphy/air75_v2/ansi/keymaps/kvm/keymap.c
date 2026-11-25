@@ -88,9 +88,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KC_F13:
             // Caps Lock tap on WIN_BASE (see CAPS_CTL_WIN above): Left Alt+Shift, the Windows
             // default "Between input languages" hotkey. Prefer Win+Space? Use:
-            //   SEND_STRING(SS_DOWN(X_LGUI) SS_TAP(X_SPC) SS_UP(X_LGUI));
+            //   SEND_STRING(SS_DOWN(X_LGUI) SS_DELAY(50) SS_TAP(X_SPC) SS_DELAY(50) SS_UP(X_LGUI));
             if (record->event.pressed) {
-                SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_LSFT) SS_UP(X_LALT));
+                // The pauses matter: sent back-to-back (0 ms between reports), Windows does not
+                // recognise the Alt+Shift language hotkey. 50 ms steps read like a human key press.
+                SEND_STRING(SS_DOWN(X_LALT) SS_DELAY(50) SS_DOWN(X_LSFT) SS_DELAY(50) SS_UP(X_LSFT) SS_DELAY(50) SS_UP(X_LALT));
             }
             return false;
         default:
