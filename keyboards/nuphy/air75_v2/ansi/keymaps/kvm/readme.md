@@ -19,6 +19,18 @@ means Ctrl — fast `Ctrl+C` works; Caps Lock released before the next key means
 - `Fn+Caps` is the real Caps Lock (also what the side-light Caps indicator and the Caps Word light look for).
 - Win+Space instead of Alt+Shift: one line in `process_record_user` in `keymap.c`.
 
+## Fn layer (both Mac and Win), on keys that were transparent before
+
+| Fn + | Sends |
+|---|---|
+| `H` `J` `K` `L` | ← ↓ ↑ → |
+| `U` / `O` | Home / End |
+| `P` / `N` | Page Up / Page Down |
+| `;` / `'` | previous / next tab (Win: Ctrl+Tab, Ctrl+Shift+Tab; Mac: Cmd+Shift+[ / ]) |
+| `Backspace` | Delete |
+
+Holding `Fn+Shift` still opens the `Fn+M` settings layer; everything else on Fn is unchanged.
+
 ## Build and flash
 
 ```sh
