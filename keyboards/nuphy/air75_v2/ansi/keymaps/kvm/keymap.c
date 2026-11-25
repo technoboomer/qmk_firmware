@@ -85,16 +85,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case KC_F13:
-            // Caps Lock tap on WIN_BASE (see CAPS_CTL_WIN above): Left Alt+Shift, the Windows
-            // default "Between input languages" hotkey. Prefer Win+Space? Use:
-            //   SEND_STRING(SS_DOWN(X_LGUI) SS_DELAY(50) SS_TAP(X_SPC) SS_DELAY(50) SS_UP(X_LGUI));
-            if (record->event.pressed) {
-                // The pauses matter: sent back-to-back (0 ms between reports), Windows does not
-                // recognise the Alt+Shift language hotkey. 50 ms steps read like a human key press.
-                SEND_STRING(SS_DOWN(X_LALT) SS_DELAY(50) SS_DOWN(X_LSFT) SS_DELAY(50) SS_UP(X_LSFT) SS_DELAY(50) SS_UP(X_LALT));
+        case CAPS_CTL_WIN:
+            // QMK hands a mod-tap's tap to the keymap as the mod-tap keycode itself, with tap.count > 0
+            // (quantum/action.c then sends the tap key with register_code(), bypassing process_record).
+            // So intercept the Caps Lock tap here; plain KC_F13 never comes through this switch.
+            if (record->tap.count > 0) {
+                if (record->event.pressed) {
+                    // Left Alt+Shift, the Windows default "Between input languages" hotkey. The pauses matter:
+                    // sent back-to-back (0 ms between reports), Windows does not recognise the hotkey.
+                    // 50 ms steps read like a human key press. Prefer Win+Space? Use:
+                    //   SEND_STRING(SS_DOWN(X_LGUI) SS_DELAY(50) SS_TAP(X_SPC) SS_DELAY(50) SS_UP(X_LGUI));
+                    SEND_STRING(SS_DOWN(X_LALT) SS_DELAY(50) SS_DOWN(X_LSFT) SS_DELAY(50) SS_UP(X_LSFT) SS_DELAY(50) SS_UP(X_LALT));
+                }
+                return false; // both the tap press and its release are ours: F13 must not reach the host
             }
-            return false;
+            return true;    // hold: QMK registers Left Ctrl
         default:
             return true;
     }
