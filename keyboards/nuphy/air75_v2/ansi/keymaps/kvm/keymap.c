@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include QMK_KEYBOARD_H
 #include "layer_names.h"
 
-// Caps Lock: tap = switch input layout, hold = Left Ctrl (config.h: TAPPING_TERM, PERMISSIVE_HOLD).
+// Caps Lock: tap = switch input layout, hold = Left Ctrl (config.h: PERMISSIVE_HOLD; get_tapping_term: 170 ms).
 // The keyboard alone does it; no software on the host:
 //  - MAC_BASE: the tap sends Caps Lock. macOS has a checkbox for exactly this key
 //    ("Use the Caps Lock key to switch to and from ABC", System Settings > Keyboard > Input Sources).
@@ -95,5 +95,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         default:
             return true;
+    }
+}
+
+// Caps Lock counts as Ctrl after 170 ms (the board-wide default in keyboard.json is 200).
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case CAPS_CTL_MAC:
+        case CAPS_CTL_WIN:
+            return 170;
+        default:
+            return TAPPING_TERM;
     }
 }
